@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="5.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="movietag.Controller">
+   <children>
+      <HBox alignment="CENTER" spacing="5.0">
+         <children>
+            <Button fx:id="btnOpenFile" mnemonicParsing="false" onAction="#openFile" text="Open Movie" />
+            <TextField fx:id="txtSearch" disable="true" HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnSearch" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#searchTMDB" text="Search" />
+            <Button fx:id="btnSave" disable="true" mnemonicParsing="false" onAction="#writeTag" style="-fx-base: lightgreen;" text="Write Tags" />
+         </children>
+      </HBox>
+      <ListView fx:id="lstResults" prefHeight="200.0" prefWidth="450.0" />
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</VBox>
