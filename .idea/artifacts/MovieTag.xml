@@ -1,0 +1,40 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="MovieTag">
+    <output-path>$PROJECT_DIR$/out/artifacts/MovieTag</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="movietag.Main" />
+        <option name="description" value="Add tag and cover art to mp4 and mkv video files." />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="icons">
+          <JavaFxApplicationIcons>
+            <option name="linuxIcon" value="$PROJECT_DIR$/src/main/resources/MovieTag.png" />
+            <option name="windowsIcon" value="$PROJECT_DIR$/src/main/resources/MovieTag.ico" />
+          </JavaFxApplicationIcons>
+        </option>
+        <option name="nativeBundle" value="all" />
+        <option name="title" value="Movie Tag" />
+        <option name="vendor" value="Panagiotis Dimopoulos" />
+        <option name="version" value="" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="MovieTag.jar">
+        <element id="module-output" name="MovieTag" />
+      </element>
+      <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.8.11" />
+      <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.8.11" />
+      <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.8.11" />
+      <element id="library" level="project" name="Maven: com.google.code.findbugs:jsr305:3.0.2" />
+      <element id="library" level="project" name="Maven: com.google.guava:guava:18.0" />
+      <element id="library" level="project" name="Maven: commons-codec:commons-codec:1.10" />
+      <element id="library" level="project" name="Maven: commons-io:commons-io:2.6" />
+      <element id="library" level="project" name="Maven: info.movito:themoviedbapi:1.9" />
+      <element id="library" level="project" name="Maven: org.apache.commons:commons-lang3:3.3.2" />
+      <element id="library" level="project" name="Maven: org.jcodec:jcodec:0.2.3" />
+      <element id="library" level="project" name="Maven: org.slf4j:jcl-over-slf4j:1.7.7" />
+      <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.7" />
+      <element id="library" level="project" name="TrayNotification" />
+    </root>
+  </artifact>
+</component>

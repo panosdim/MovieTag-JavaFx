@@ -2,6 +2,9 @@
   <dictionary name="padi">
     <words>
       <w>covr</w>
+      <w>fourcc</w>
+      <w>ldes</w>
+      <w>mkvpropedit</w>
       <w>tmdb</w>
     </words>
   </dictionary>

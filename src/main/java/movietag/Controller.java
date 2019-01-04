@@ -13,17 +13,19 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jcodec.containers.mp4.boxes.MetaValue;
 import org.jcodec.movtool.MetadataEditor;
 import org.jcodec.platform.Platform;
+import tray.animations.AnimationType;
+import tray.notification.NotificationType;
+import tray.notification.TrayNotification;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -33,7 +35,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ResourceBundle;
 
 public class Controller {
     public Button btnOpenFile;
@@ -130,12 +131,6 @@ public class Controller {
         }
     }
 
-    private String fourccToString(int key) {
-        byte[] bytes = new byte[4];
-        ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).putInt(key);
-        return Platform.stringFromCharset(bytes, Charset.defaultCharset());
-    }
-
     private int stringToFourcc(String fourcc) {
         if (fourcc.length() != 4)
             return 0;
@@ -144,23 +139,17 @@ public class Controller {
     }
 
     private byte[] downloadUrl(URL toDownload) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
+        File tmpFile;
         try {
-            byte[] chunk = new byte[4096];
-            int bytesRead;
-            InputStream stream = toDownload.openStream();
+            tmpFile = File.createTempFile("cover", ".jpg");
+            tmpFile.deleteOnExit();
 
-            while ((bytesRead = stream.read(chunk)) > 0) {
-                outputStream.write(chunk, 0, bytesRead);
-            }
-
+            FileUtils.copyURLToFile(toDownload, tmpFile);
+            return FileUtils.readFileToByteArray(tmpFile);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
-
-        return outputStream.toByteArray();
     }
 
     public void searchTMDB() {
@@ -175,68 +164,90 @@ public class Controller {
 
     public void writeTag() {
         btnSave.setDisable(true);
-        MovieDb selectedMovie = lstResults.getSelectionModel().getSelectedItem();
 
         String ext = FilenameUtils.getExtension(movie.getName());
         if (ext.equals("mp4")) {
-            try {
-                mediaMeta = MetadataEditor.createFrom(movie);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            writeMp4Tags();
+        } else {
+            writeMkvTags();
+        }
+    }
+
+    private void writeMp4Tags() {
+        MovieDb selectedMovie = lstResults.getSelectionModel().getSelectedItem();
+
+        try {
+            mediaMeta = MetadataEditor.createFrom(movie);
             Map<Integer, MetaValue> iTunesMeta = mediaMeta.getItunesMeta();
             if (iTunesMeta != null) {
                 URL imgPath;
-                try {
-                    imgPath = new URL(baseUrl + posterSize + selectedMovie.getPosterPath());
-                    Task<byte[]> task = new Task<byte[]>() {
-                        @Override
-                        public byte[] call() {
-                            return downloadUrl(imgPath);
+                imgPath = new URL(baseUrl + posterSize + selectedMovie.getPosterPath());
+
+                Task<byte[]> task = new Task<byte[]>() {
+                    @Override
+                    public byte[] call() {
+                        return downloadUrl(imgPath);
+                    }
+
+                    @Override
+                    protected void succeeded() {
+                        super.succeeded();
+                        iTunesMeta.clear();
+                        iTunesMeta.put(stringToFourcc("covr"), MetaValue.createOther(MetaValue.TYPE_JPEG, this.getValue()));
+                        iTunesMeta.put(stringToFourcc("name"), MetaValue.createString(selectedMovie.getOriginalTitle()));
+                        iTunesMeta.put(stringToFourcc("ldes"), MetaValue.createString(selectedMovie.getOverview()));
+                        try {
+                            mediaMeta.save(true); // fast mode is on
+                            showNotification("MP4 Movie Tag", "Tags saved successfully", NotificationType.SUCCESS);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
+                        btnSave.setDisable(false);
+                    }
+                };
 
-                        @Override
-                        protected void succeeded() {
-                            super.succeeded();
-                            iTunesMeta.put(stringToFourcc("covr"), MetaValue.createOther(MetaValue.TYPE_JPEG, this.getValue()));
-                            try {
-                                mediaMeta.save(true); // fast mode is on
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            btnSave.setDisable(false);
-                        }
-                    };
-
-                    new Thread(task).start();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
+                new Thread(task).start();
             }
-        } else {
-            try {
-                Process p;
-                File image = File.createTempFile("cover", ".jpg");
-                image.deleteOnExit();
-                FileUtils.copyURLToFile(new URL(baseUrl + posterSize + selectedMovie.getPosterPath()), image);
-
-                p = new ProcessBuilder(mkvPropEdit.getAbsolutePath(), movie.getAbsolutePath(), "--delete-attachment", "mime-type:image/jpeg").start();
-                p.waitFor();
-                if (p.exitValue() == 2) {
-                    System.out.println("Error occurred when try to delete attachments.");
-                }
-
-                p = new ProcessBuilder(mkvPropEdit.getAbsolutePath(), movie.getAbsolutePath(),
-                        "--attachment-name", "cover.jpg",
-                        "--attachment-mime-type", "image/jpeg",
-                        "--add-attachment", image.getAbsolutePath()).start();
-                p.waitFor();
-                if (p.exitValue() == 2) {
-                    System.out.println("Error occurred when try to add attachments.");
-                }
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    private void writeMkvTags() {
+        MovieDb selectedMovie = lstResults.getSelectionModel().getSelectedItem();
+        try {
+            Process p;
+            File image = File.createTempFile("cover", ".jpg");
+            image.deleteOnExit();
+            FileUtils.copyURLToFile(new URL(baseUrl + posterSize + selectedMovie.getPosterPath()), image);
+
+            p = new ProcessBuilder(mkvPropEdit.getAbsolutePath(), movie.getAbsolutePath(), "--delete-attachment", "mime-type:image/jpeg").start();
+            p.waitFor();
+            if (p.exitValue() == 2) {
+                showNotification("MKV Movie Tag", "Error occurred when try to delete attachments.", NotificationType.ERROR);
+            }
+
+            p = new ProcessBuilder(mkvPropEdit.getAbsolutePath(), movie.getAbsolutePath(),
+                    "--attachment-name", "cover.jpg",
+                    "--attachment-mime-type", "image/jpeg",
+                    "--add-attachment", image.getAbsolutePath()).start();
+            p.waitFor();
+            if (p.exitValue() == 2) {
+                showNotification("MKV Movie Tag", "Error occurred when try to add attachments.", NotificationType.ERROR);
+            }
+
+            showNotification("MKV Movie Tag", "Tags saved successfully", NotificationType.SUCCESS);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showNotification(String title, String message, NotificationType type) {
+        TrayNotification tray = new TrayNotification();
+        tray.setTitle(title);
+        tray.setMessage(message);
+        tray.setNotificationType(type);
+        tray.setAnimationType(AnimationType.POPUP);
+        tray.showAndDismiss(Duration.seconds(0.5));
     }
 }
