@@ -11,12 +11,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        // TODO: Update proxy settings
-        System.setProperty("http.proxyHost", "iproxy.intracomtel.com");
-        System.setProperty("http.proxyPort", "80");
-        System.setProperty("https.proxyHost", "iproxy.intracomtel.com");
-        System.setProperty("https.proxyPort", "80");
-
         Parent root = FXMLLoader.load(getClass().getResource("/main.fxml"));
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());

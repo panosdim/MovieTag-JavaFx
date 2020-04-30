@@ -7,12 +7,14 @@ import info.movito.themoviedbapi.model.config.TmdbConfiguration;
 import info.movito.themoviedbapi.model.core.MovieResultsPage;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.text.Font;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
-import javafx.util.Callback;
 import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -32,9 +34,13 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Controller {
     public Button btnOpenFile;
@@ -42,6 +48,7 @@ public class Controller {
     public Button btnSearch;
     public ListView<MovieDb> lstResults;
     public Button btnSave;
+    public ImageView imgPoster;
     private TmdbApi tmdb;
     private MetadataEditor mediaMeta;
     private String baseUrl;
@@ -58,6 +65,10 @@ public class Controller {
             e.printStackTrace();
         }
         tmdb = new TmdbApi(props.getProperty("KEY"));
+        System.setProperty("http.proxyHost", props.getProperty("PROXYHOST"));
+        System.setProperty("http.proxyPort", props.getProperty("PROXYPORT"));
+        System.setProperty("https.proxyHost", props.getProperty("PROXYHOST"));
+        System.setProperty("https.proxyPort", props.getProperty("PROXYPORT"));
 
         InputStream mkv = getClass().getResourceAsStream("/mkvpropedit.exe");
         try {
@@ -68,7 +79,6 @@ public class Controller {
             e.printStackTrace();
         }
 
-
         TmdbConfiguration config = tmdb.getConfiguration();
         List<String> posterSizes = config.getPosterSizes();
         posterSize = "w500";
@@ -77,41 +87,7 @@ public class Controller {
         }
         baseUrl = config.getSecureBaseUrl();
 
-        lstResults.setCellFactory(new Callback<ListView<MovieDb>, ListCell<MovieDb>>() {
-            @Override
-            public ListCell<MovieDb> call(ListView<MovieDb> param) {
-                final Tooltip tooltip = new Tooltip();
-                tooltip.setFont(new Font(12));
-                ListCell<MovieDb> cell = new ListCell<MovieDb>() {
-                    @Override
-                    protected void updateItem(MovieDb item, boolean bln) {
-                        super.updateItem(item, bln);
-                        if (item != null) {
-                            setText(String.format("%-50.50s %10s", item.getOriginalTitle(), item.getReleaseDate()));
-                        } else {
-                            setText(null);
-                        }
-                    }
-                };
-
-                cell.hoverProperty().addListener((obs, wasHovered, isNowHovered) -> {
-                    if (isNowHovered && !cell.isEmpty()) {
-                        MovieDb movie = cell.getItem();
-                        StringBuilder sb = new StringBuilder(movie.getOverview());
-
-                        int i = 0;
-                        while ((i = sb.indexOf(" ", i + 30)) != -1) {
-                            sb.replace(i, i + 1, "\n");
-                        }
-                        tooltip.setText(sb.toString());
-                        tooltip.setGraphic(new ImageView(new Image(baseUrl + "w45" + movie.getPosterPath(), 45, 64, false, false)));
-                        cell.setTooltip(tooltip);
-                    }
-                });
-
-                return cell;
-            }
-        });
+        lstResults.setCellFactory(alignedListView -> new AlignedListViewCell());
     }
 
     public void openFile() {
@@ -127,13 +103,25 @@ public class Controller {
             txtSearch.setDisable(false);
             btnSearch.setDisable(false);
             btnSave.setDisable(true);
-            txtSearch.setText(FilenameUtils.removeExtension(movie.getName()));
+            String searchText = FilenameUtils.removeExtension(movie.getName());
+            String movieRegex = "([ .\\w']+?)(\\W\\d{4}\\W?.*)";
+            Pattern pattern = Pattern.compile(movieRegex);
+            Matcher matcher = pattern.matcher(movie.getName());
+            if (matcher.matches()) {
+                String movieName = matcher.group(1).replaceAll("\\.", " ");
+                movieName = Arrays.stream(movieName.split("\\s+"))
+                        .map(t -> t.substring(0, 1).toUpperCase() + t.substring(1))
+                        .collect(Collectors.joining(" "));
+                searchText = movieName;
+            }
+            txtSearch.setText(searchText);
         }
     }
 
     private int stringToFourcc(String fourcc) {
-        if (fourcc.length() != 4)
+        if (fourcc.length() != 4) {
             return 0;
+        }
         byte[] bytes = Platform.getBytesForCharset(fourcc, Charset.defaultCharset());
         return ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).getInt();
     }
@@ -159,7 +147,14 @@ public class Controller {
 
         MovieResultsPage searchResults = search.searchMovie(txtSearch.getText(), 0, null, false, 0);
         lstResults.setItems(FXCollections.observableArrayList(searchResults.getResults()));
-        lstResults.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> btnSave.setDisable(false));
+        lstResults.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            btnSave.setDisable(false);
+            if (newValue != null) {
+                imgPoster.setImage(new Image(baseUrl + "w154" + newValue.getPosterPath(), 154, 235, false, false));
+            } else {
+                imgPoster.setImage(null);
+            }
+        });
     }
 
     public void writeTag() {
@@ -193,7 +188,7 @@ public class Controller {
                     protected void succeeded() {
                         super.succeeded();
                         iTunesMeta.clear();
-                        iTunesMeta.put(stringToFourcc("covr"), MetaValue.createOther(MetaValue.TYPE_JPEG, this.getValue()));
+                        iTunesMeta.put(stringToFourcc("covr"), MetaValue.createOther(MetaValue.TYPE_JPEG, getValue()));
                         iTunesMeta.put(stringToFourcc("name"), MetaValue.createString(selectedMovie.getOriginalTitle()));
                         iTunesMeta.put(stringToFourcc("ldes"), MetaValue.createString(selectedMovie.getOverview()));
                         try {
@@ -249,5 +244,36 @@ public class Controller {
         tray.setNotificationType(type);
         tray.setAnimationType(AnimationType.POPUP);
         tray.showAndDismiss(Duration.seconds(0.5));
+    }
+}
+
+final class AlignedListViewCell extends ListCell<MovieDb> {
+    @Override
+    protected void updateItem(MovieDb item, boolean empty) {
+        super.updateItem(item, empty);
+        if (empty) {
+            setGraphic(null);
+        } else {
+            // Create the HBox
+            HBox hBox = new HBox(5);
+
+            // Create movie name Label
+            Label name = new Label(item.getOriginalTitle());
+            name.setAlignment(Pos.BASELINE_LEFT);
+            HBox.setHgrow(name, Priority.NEVER);
+            hBox.getChildren().add(name);
+
+            Region space = new Region();
+            HBox.setHgrow(space, Priority.ALWAYS);
+            hBox.getChildren().add(space);
+
+            // Create movie name Label
+            Label date = new Label(item.getReleaseDate());
+            date.setAlignment(Pos.BASELINE_RIGHT);
+            HBox.setHgrow(date, Priority.NEVER);
+            hBox.getChildren().add(date);
+
+            setGraphic(hBox);
+        }
     }
 }
