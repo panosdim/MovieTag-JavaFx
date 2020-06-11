@@ -24,9 +24,8 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cdb932d9-7e58-4d94-93a9-e7b232ef17da" name="Default" comment="Add poster image when select movie. Improve movie name in search input field.">
+    <list default="true" id="cdb932d9-7e58-4d94-93a9-e7b232ef17da" name="Default" comment="Change UI to use Bordered Pane.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/main.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/main.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -243,7 +242,9 @@
       <workItem from="1588153566973" duration="761000" />
       <workItem from="1588154495136" duration="6149000" />
       <workItem from="1588164806514" duration="626000" />
-      <workItem from="1588165641969" duration="13236000" />
+      <workItem from="1588165641969" duration="13510000" />
+      <workItem from="1588945650511" duration="599000" />
+      <workItem from="1591796311063" duration="599000" />
     </task>
     <task id="LOCAL-00001" summary="Add notification and icons.">
       <created>1546607135669</created>
@@ -259,7 +260,14 @@
       <option name="project" value="LOCAL" />
       <updated>1588236684475</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Change UI to use Bordered Pane.">
+      <created>1588238300373</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1588238300373</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -282,37 +290,38 @@
     <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
     <MESSAGE value="Add notification and icons." />
     <MESSAGE value="Add poster image when select movie. Improve movie name in search input field." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add poster image when select movie. Improve movie name in search input field." />
+    <MESSAGE value="Change UI to use Bordered Pane." />
+    <option name="LAST_COMMIT_MESSAGE" value="Change UI to use Bordered Pane." />
   </component>
   <component name="WindowStateProjectService">
     <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1588165363566">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1588165363566" />
-    <state x="395" y="0" key="CommitChangelistDialog2" timestamp="1588236683403">
+    <state x="395" y="0" key="CommitChangelistDialog2" timestamp="1588238299494">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="395" y="0" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1588236683403" />
+    <state x="395" y="0" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1588238299494" />
     <state x="549" y="153" key="FileChooserDialogImpl" timestamp="1588156496829">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="549" y="153" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1588156496829" />
-    <state width="1493" height="210" key="GridCell.Tab.0.bottom" timestamp="1588237325643">
+    <state width="1493" height="210" key="GridCell.Tab.0.bottom" timestamp="1588238551591">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="210" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1588237325643" />
-    <state width="1493" height="210" key="GridCell.Tab.0.center" timestamp="1588237325643">
+    <state width="1493" height="210" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1588238551591" />
+    <state width="1493" height="210" key="GridCell.Tab.0.center" timestamp="1588238551591">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="210" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1588237325643" />
-    <state width="1493" height="210" key="GridCell.Tab.0.left" timestamp="1588237325642">
+    <state width="1493" height="210" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1588238551591" />
+    <state width="1493" height="210" key="GridCell.Tab.0.left" timestamp="1588238551591">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="210" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1588237325642" />
-    <state width="1493" height="210" key="GridCell.Tab.0.right" timestamp="1588237325643">
+    <state width="1493" height="210" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1588238551591" />
+    <state width="1493" height="210" key="GridCell.Tab.0.right" timestamp="1588238551591">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="210" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1588237325643" />
+    <state width="1493" height="210" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1588238551591" />
     <state width="1493" height="261" key="GridCell.Tab.1.bottom" timestamp="1588165432521">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -333,10 +342,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="277" y="55" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1588228204119" />
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1588236707961">
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1588238302071">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1588236707961" />
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1588238302071" />
   </component>
   <component name="antWorkspaceConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
