@@ -1,0 +1,10 @@
+#btnWriteTags {
+    -fx-base: lightgreen;
+}
+
+.list-cell:empty
+{
+    -fx-background-color: white;
+}
+
+
