@@ -2,8 +2,8 @@ plugins {
     id 'java'
     id 'application'
     id "org.javamodularity.moduleplugin" version "1.8.15"
-    id 'org.openjfx.javafxplugin' version '0.0.13'
-    id 'org.beryx.jlink' version '2.26.0'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'org.beryx.jlink' version '3.1.1'
 }
 
 group 'com.panosdim'
@@ -11,6 +11,7 @@ version '1.0'
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+    modularity.inferModulePath.set(false)
 }
 repositories {
     mavenCentral()
@@ -37,13 +38,13 @@ javafx {
 dependencies {
     implementation "org.openjfx:javafx-controls:${javafx.version}"
     implementation "org.openjfx:javafx-fxml:${javafx.version}"
-    implementation "uk.co.conoregan:themoviedbapi:2.1.1"
-    implementation 'commons-io:commons-io:2.14.0'
-    implementation 'org.slf4j:slf4j-api:2.0.9'
-    implementation 'ch.qos.logback:logback-classic:1.4.12'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
+    implementation 'uk.co.conoregan:themoviedbapi:2.3.0'
+    implementation 'commons-io:commons-io:2.18.0'
+    implementation 'org.slf4j:slf4j-api:2.0.13'
+    implementation 'ch.qos.logback:logback-classic:1.5.12'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.2'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
     implementation 'org.jcodec:jcodec:0.2.5'
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
@@ -53,14 +54,18 @@ test {
     useJUnitPlatform()
 }
 
-jlink {
-    imageZip = layout.buildDirectory.file("distributions/app-${javafx.platform.classifier}.zip").get().asFile
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
-    launcher {
-        name = 'app'
+jar {
+    manifest {
+        attributes(
+                'Main-Class': application.mainClass
+        )
     }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-jlinkZip {
-    group = 'distribution'
+jlink {
+    options = ['--strip-debug', '--compress=2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'MovieTag'
+    }
 }

@@ -4,6 +4,7 @@ module com.panosdim.movietag {
     requires info.movito.themoviedbapi;
     requires org.apache.commons.io;
     requires org.slf4j;
+    requires ch.qos.logback.classic;
     requires jcodec;
 
 
